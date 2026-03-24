@@ -11,7 +11,6 @@ RBI only:         python main.py --source rbi
 Skip summaries:   python main.py --no-summary
 """
 
-import os
 import re
 import time
 import argparse
@@ -23,6 +22,7 @@ from io import BytesIO
 from supabase import create_client, Client
 
 # ── CONFIGURATION ──────────────────────────────────────────────
+import os
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "")
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
