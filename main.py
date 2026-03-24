@@ -55,8 +55,12 @@ RBI_SKIP_TITLES = {
 
 # ── SUPABASE ────────────────────────────────────────────────────
 def get_supabase() -> Client:
-    if "PASTE" in SUPABASE_URL:
-        print("\n ERROR: Paste your Supabase credentials into main.py\n")
+    print(f"    SUPABASE_URL length: {len(SUPABASE_URL)}")
+    print(f"    SUPABASE_KEY length: {len(SUPABASE_KEY)}")
+    if not SUPABASE_URL or not SUPABASE_KEY:
+        print("\n ERROR: Supabase credentials are empty.")
+        print("    Locally: check your .env file")
+        print("    GitHub Actions: check repo Settings → Secrets → Actions\n")
         exit(1)
     return create_client(SUPABASE_URL, SUPABASE_KEY)
 
