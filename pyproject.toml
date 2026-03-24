@@ -1,0 +1,15 @@
+[project]
+name = "regulatory-intelligence"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "beautifulsoup4>=4.14.3",
+    "lxml>=6.0.2",
+    "pypdf>=6.9.1",
+    "requests>=2.32.5",
+    "selenium>=4.41.0",
+    "supabase",
+    "webdriver-manager>=4.0.2",
+]
