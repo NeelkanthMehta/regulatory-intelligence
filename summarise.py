@@ -9,16 +9,15 @@ RBI only: python summarise.py --source rbi
 SEBI only: python summarise.py --source sebi
 """
 
-import os
 import time
 import argparse
 import requests
 from supabase import create_client, Client
 
 # ── CONFIGURATION ──────────────────────────────────────────────
-SUPABASE_URL = os.getenv("SUPABASE_URL","")
-SUPABASE_KEY = os.getenv("SUPABASE_KEY","")
-GROQ_API_KEY = os.getenv("GROQ_API_KEY","")
+SUPABASE_URL = "PASTE_YOUR_SUPABASE_URL"
+SUPABASE_KEY = "PASTE_YOUR_SUPABASE_KEY"
+GROQ_API_KEY = "PASTE_YOUR_GROQ_API_KEY"
 
 # ── SUPABASE ────────────────────────────────────────────────────
 def get_supabase() -> Client:
@@ -28,7 +27,21 @@ def get_supabase() -> Client:
     return create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # ── AI SUMMARY ──────────────────────────────────────────────────
-def generate_summary(title: str, content: str) -> str:
+def generate_summary(title: str, content: str, regulator: str) -> str:
+    """
+    RBI — full AI summary from content.
+    SEBI — structured placeholder from title/metadata (content too thin).
+    """
+    if regulator == "SEBI":
+        # Generate a structured placeholder from title alone
+        return (
+            f"This SEBI circular titled '{title}' is available in the database with "
+            f"metadata including circular reference, date, and category. Full body text "
+            f"is pending extraction due to SEBI website restrictions. Please verify the "
+            f"complete circular directly at sebi.gov.in for compliance purposes."
+        )
+
+    # RBI — full AI summary
     if not content or len(content) < 100:
         return ""
     try:
@@ -81,15 +94,20 @@ def main():
     result = query.execute()
     rows   = result.data
 
-    # Filter to rows with content but empty/missing summary
+    # Filter to rows needing summary — RBI needs content, SEBI just needs title
     to_update = [
         r for r in rows
-        if r.get("content") and len(r["content"]) > 100
-        and not r.get("summary")
+        if not r.get("summary") and (
+            r["regulator"] == "SEBI" or  # SEBI always gets placeholder
+            (r.get("content") and len(r["content"]) > 100)  # RBI needs content
+        )
     ]
 
-    print(f"Rows with content: {len([r for r in rows if r.get('content') and len(r['content']) > 100])}")
-    print(f"Rows needing summary: {len(to_update)}\n")
+    sebi_count = len([r for r in to_update if r["regulator"] == "SEBI"])
+    rbi_count  = len([r for r in to_update if r["regulator"] == "RBI"])
+
+    print(f"Rows with content (RBI): {len([r for r in rows if r.get('content') and len(r['content']) > 100])}")
+    print(f"Rows needing summary — RBI: {rbi_count} | SEBI: {sebi_count}\n")
 
     if not to_update:
         print("Nothing to update — all rows with content already have summaries.")
@@ -105,7 +123,7 @@ def main():
         reg     = row["regulator"]
 
         print(f"  [{reg}] {title[:60]}...")
-        summary = generate_summary(title, content)
+        summary = generate_summary(title, content, reg)
 
         if summary:
             try:
@@ -129,7 +147,7 @@ def main():
             print(f"    Skipped — content too short or Groq unavailable")
             skipped += 1
 
-        time.sleep(0.5)  # respect Groq rate limits
+        time.sleep(0.5 if reg == "RBI" else 0)  # only RBI calls Groq API
 
     print(f"\n{'='*60}")
     print(f"  Done. {updated} summaries generated, {skipped} skipped.")
