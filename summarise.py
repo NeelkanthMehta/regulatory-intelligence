@@ -9,15 +9,16 @@ RBI only: python summarise.py --source rbi
 SEBI only: python summarise.py --source sebi
 """
 
+import os
 import time
 import argparse
 import requests
 from supabase import create_client, Client
 
 # ── CONFIGURATION ──────────────────────────────────────────────
-SUPABASE_URL = "PASTE_YOUR_SUPABASE_URL"
-SUPABASE_KEY = "PASTE_YOUR_SUPABASE_KEY"
-GROQ_API_KEY = "PASTE_YOUR_GROQ_API_KEY"
+SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
+SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "")
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
 
 # ── SUPABASE ────────────────────────────────────────────────────
 def get_supabase() -> Client:
