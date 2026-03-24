@@ -16,6 +16,9 @@ from supabase import create_client, Client
 
 # ── CONFIGURATION ──────────────────────────────────────────────
 import os
+from dotenv import load_dotenv
+load_dotenv()  # loads .env file if present, ignored in GitHub Actions
+
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "")
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
