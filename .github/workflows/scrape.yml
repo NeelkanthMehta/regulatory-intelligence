@@ -29,11 +29,11 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-        run: uv run python main.py --no-summary
+        run: uv run python main.py
 
-      - name: Run summariser (RBI only — has full content)
+      - name: Run summariser — RBI (full AI summary) + SEBI (placeholder)
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-        run: uv run python summarise.py --source rbi
+        run: uv run python summarise.py
